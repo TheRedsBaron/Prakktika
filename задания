@@ -1,0 +1,160 @@
+#include <iostream>
+#include <cmath>
+#include <complex>
+using namespace std;
+
+
+int number {
+    cout << "Сообщение номер " << number << ": Hello!" << endl;
+}
+
+void findCubicRoots(float a, float b, float c) {
+  
+    if (a == 0.0f) {
+        cout << "Коэффициент a не может быть равен нулю." << endl;
+        return;
+    }
+
+    float delta = b * b - 3 * a * c;
+    if (delta > 0) {
+        float root1 = (-b + sqrt(delta)) / (3 * a);
+        float root2 = (-b - sqrt(delta)) / (3 * a);
+        float root3 = -b / (3 * a);
+        
+        cout << "Корни кубического уравнения:" << endl;
+        cout << "Root 1: " << root1 << endl;
+        cout << "Root 2: " << root2 << endl;
+        cout << "Root 3: " << root3 << endl;
+    } 
+    else if (delta == 0) {
+        float root = -b / (3 * a);
+        cout << "У кубического уравнения один корень:" << endl;
+        cout << "Root: " << root << endl;
+    } 
+    else {
+        complex<float> root1 = complex<float>(-b / (3 * a), sqrt(-delta) / (3 * a));
+        complex<float> root2 = complex<float>(-b / (3 * a), -sqrt(-delta) / (3 * a));
+        complex<float> root3 = complex<float>(-b / (3 * a), 0);
+        
+        cout << "Корни кубического уравнения :" << endl;
+        cout << "Root 1: " << root1 << endl;
+        cout << "Root 2: " << root2 << endl;
+        cout << "Root 3: " << root3 << endl;
+    }
+
+
+    return 0;
+}
+// задание урок 1
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+// Функция для вычисления выражения ((a + 2*b)^11 - 5*c) * 3
+double calculateExpression(int a, int b, int c) {
+    return (pow(a + 2 * b, 11) - 5 * c) * 3;
+}
+
+// Функция для нахождения нетривиальных делителей числа
+void printNonTrivialDivisors(int num) {
+    cout << "Нетривиальные делители числа " << num << ": ";
+    for (int i = 2; i <= num / 2; ++i) {
+        if (num % i == 0) {
+            cout << i << " ";
+        }
+    }
+    cout << endl;
+}
+
+// Функция для замены всех элементов списка, не равных максимальному и минимальному на нули
+vector<int> replaceNonExtremes(vector<int>& nums) {
+    int maxVal = *max_element(nums.begin(), nums.end());
+    int minVal = *min_element(nums.begin(), nums.end());
+    for (int& num : nums) {
+        if (num != maxVal && num != minVal) {
+            num = 0;
+        }
+    }
+    return nums;
+}
+
+// Функция для нахождения наибольшего полного квадрата в отрезке от l до r
+int largestPerfectSquare(int l, int r) {
+    int largestSquare = -1;
+    for (int i = sqrt(r); i >= sqrt(l); --i) {
+        int square = i * i;
+        if (square >= l && square <= r) {
+            largestSquare = square;
+            break;
+        }
+    }
+    return largestSquare;
+}
+
+// Функция для вычисления суммы первых n Фибоначчиевых чисел
+int sumOfFibonacci(int n) {
+    if (n <= 0) return 0;
+    if (n == 1) return 1;
+
+    int a = 0, b = 1, sum = a + b;
+    for (int i = 2; i < n; ++i) {
+        int next = a + b;
+        sum += next;
+        a = b;
+        b = next;
+    }
+    return sum;
+}
+
+int main() {
+    // Вычисление выражения
+    int a, b, c;
+    cout << "Введите целые числа a, b и c: ";
+    cin >> a >> b >> c;
+    double result = calculateExpression(a, b, c);
+    cout << "Результат выражения: " << result << endl;
+
+    // Ввод числа для делителей
+    int number;
+    cout << "Введите целое число для нахождения нетривиальных делителей: ";
+    cin >> number;
+    printNonTrivialDivisors(number);
+
+    // Ввод списка чисел
+    int n;
+    cout << "Введите размер списка: ";
+    cin >> n;
+    vector<int> nums(n);
+    cout << "Введите " << n << " целых числа: ";
+    for (int i = 0; i < n; ++i) {
+        cin >> nums[i];
+    }
+    vector<int> modifiedList = replaceNonExtremes(nums);
+    cout << "Измененный список: ";
+    for (int num : modifiedList) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    // Ввод отрезка для нахождения полного квадрата
+    int l, r;
+    cout << "Введите границы отрезка (l и r): ";
+    cin >> l >> r;
+    int largestSquare = largestPerfectSquare(l, r);
+    if (largestSquare != -1) {
+        cout << "Наибольший полный квадрат в отрезке [" << l << ", " << r << "]: " << largestSquare << endl;
+    } else {
+        cout << "Нет полных квадратов в данном отрезке." << endl;
+    }
+
+    // Ввод числа для суммы Фибоначчиевых чисел
+    int fibCount;
+    cout << "Введите количество первых Фибоначчиевых чисел для суммы: ";
+    cin >> fibCount;
+    int fibSum = sumOfFibonacci(fibCount);
+    cout << "Сумма первых " << fibCount << " Фибоначчиевых чисел: " << fibSum << endl;
+
+    return 0;
+}
