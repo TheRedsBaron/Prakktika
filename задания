@@ -1,50 +1,39 @@
 #include <iostream>
 #include <cmath>
-#include <complex>
-using namespace std;
 
-
-int number {
-    cout << "Сообщение номер " << number << ": Hello!" << endl;
+float f(float x, float a, float b, float c, float d) {
+    return a * x * x * x + b * x * x + c * x + d;
 }
 
-void findCubicRoots(float a, float b, float c) {
-  
-    if (a == 0.0f) {
-        cout << "Коэффициент a не может быть равен нулю." << endl;
-        return;
+float f_prime(float x, float a, float b, float c) {
+    return 3 * a * x * x + 2 * b * x + c;
+}
+
+void solve_cubic(float a, float b, float c, float d) {
+    float x0 = 0;  // Начальное приближение
+    const float epsilon = 1e-6;  // Допустимая ошибка
+    float x1;
+
+    for (int i = 0; i < 100; ++i) {  // Ограничим количество итераций
+        x1 = x0 - f(x0, a, b, c, d) / f_prime(x0, a, b, c);
+        
+        if (fabs(x1 - x0) < epsilon) {
+            break;
+        }
+        x0 = x1;
     }
 
-    float delta = b * b - 3 * a * c;
-    if (delta > 0) {
-        float root1 = (-b + sqrt(delta)) / (3 * a);
-        float root2 = (-b - sqrt(delta)) / (3 * a);
-        float root3 = -b / (3 * a);
-        
-        cout << "Корни кубического уравнения:" << endl;
-        cout << "Root 1: " << root1 << endl;
-        cout << "Root 2: " << root2 << endl;
-        cout << "Root 3: " << root3 << endl;
-    } 
-    else if (delta == 0) {
-        float root = -b / (3 * a);
-        cout << "У кубического уравнения один корень:" << endl;
-        cout << "Root: " << root << endl;
-    } 
-    else {
-        complex<float> root1 = complex<float>(-b / (3 * a), sqrt(-delta) / (3 * a));
-        complex<float> root2 = complex<float>(-b / (3 * a), -sqrt(-delta) / (3 * a));
-        complex<float> root3 = complex<float>(-b / (3 * a), 0);
-        
-        cout << "Корни кубического уравнения :" << endl;
-        cout << "Root 1: " << root1 << endl;
-        cout << "Root 2: " << root2 << endl;
-        cout << "Root 3: " << root3 << endl;
-    }
+    std::cout << "Приблизительное решение: x = " << x1 << std::endl;
+}
 
-
+int main() {
+    float a, b, c, d;
+    std::cout << "Введите коэффициенты (a, b, c, d): ";
+    std::cin >> a >> b >> c >> d;
+    solve_cubic(a, b, c, d);
     return 0;
 }
+
 // задание урок 1
 #include <iostream>
 #include <vector>
