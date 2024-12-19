@@ -1,0 +1,141 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int main() {
+    int n;
+    std::cin >> n;
+    std::vector<int> numbers(n);
+    
+    for (int i = 0; i < n; ++i) {
+        std::cin >> numbers[i];
+    }
+    
+    int max_val = *std::max_element(numbers.begin(), numbers.end());
+    double sum = std::accumulate(numbers.begin(), numbers.end(), 0);
+    double average = sum / n;
+    
+    std::cout << (max_val - average) << std::endl;
+
+    return 0;
+}
+
+#include <iostream>
+#include <string>
+#include <algorithm>
+
+int main() {
+    std::string s;
+    std::cin >> s;
+
+    std::string reversed_s = s;
+    std::reverse(reversed_s.begin(), reversed_s.end());
+
+    if (s == reversed_s) {
+        std::cout << "YES" << std::endl;
+    } else {
+        std::cout << "NO" << std::endl;
+    }
+
+    return 0;
+}
+
+
+#include <iostream>
+#include <string>
+
+int main() {
+    std::string s;
+    std::cin >> s;
+
+    int max_length = 1;
+    std::string result = "";
+
+    for (size_t i = 0; i < s.length(); ++i) {
+        for (size_t j = s.length() - 1; j > i; --j) {
+            if (s[i] == s[j]) {
+                int length = j - i + 1;
+                if (length > max_length) {
+                    max_length = length;
+                    result = s.substr(i, length);
+                }
+                break; // Если нашли совпадение, выходим из внутреннего цикла
+            }
+        }
+    }
+
+    std::cout << result << std::endl;
+
+    return 0;
+}
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+
+int main() {
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<int> box1(n), box2(m);
+    
+    for (int i = 0; i < n; ++i) {
+        std::cin >> box1[i];
+    }
+    
+    for (int i = 0; i < m; ++i) {
+        std::cin >> box2[i];
+    }
+    
+    int k;
+    std::cin >> k;
+
+    std::sort(box1.rbegin(), box1.rend());
+    std::sort(box2.rbegin(), box2.rend());
+    
+    int max_weight = 0;
+    
+    // Получаем наибольшие значения
+    for (int i = 1; i < k && i <= n; ++i) {
+        for (int j = 1; j <= k - i && j <= m; ++j) {
+            if (i + j == k) {
+                int current_weight = std::accumulate(box1.begin(), box1.begin() + i, 0) +
+                                    std::accumulate(box2.begin(), box2.begin() + j, 0);
+                max_weight = std::max(max_weight, current_weight);
+            }
+        }
+    }
+
+    std::cout << max_weight << std::endl;
+
+    return 0;
+}
+
+#include <iostream>
+#include <unordered_map>
+#include <string>
+
+int main() {
+    int n;
+    std::cin >> n;
+
+    std::unordered_map<int, int> rooms;
+
+    for (int i = 0; i < n; ++i) {
+        std::string command;
+        int x;
+        std::cin >> command >> x;
+
+        if (command == "+") {
+            rooms[x]++;
+        } else if (command == "-") {
+            if (rooms[x] > 0) {
+                rooms[x]--;
+            }
+        } else if (command == "?") {
+            std::cout << rooms[x] << std::endl;
+        }
+    }
+
+    return 0;
+}
