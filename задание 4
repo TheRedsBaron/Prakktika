@@ -1,0 +1,82 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+// Функция для нахождения наибольшего числа меньше 100
+int findMaxLessThan100(const std::vector<int>& nums) {
+    int left = 0;
+    int right = nums.size() - 1;
+    int result = -1; // Значение по умолчанию, если число не найдено
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (nums[mid] < 100) {
+            result = nums[mid]; // Сохраняем результат
+            left = mid + 1; // Продолжаем поиск вправо
+        } else {
+            right = mid - 1; // Ищем в левой части
+        }
+    }
+    return result;
+}
+
+// Функция для нахождения индекса первой строки, которая не содержит буквы 'b'
+int findFirstStringWithoutB(const std::vector<std::string>& strings) {
+    int left = 0;
+    int right = strings.size() - 1;
+    int result = -1; // Значение по умолчанию, если строка не найдена
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (strings[mid].find('b') == std::string::npos) {
+            result = mid; // Сохраняем результат
+            right = mid - 1; // Ищем левее
+        } else {
+            left = mid + 1; // Ищем вправо
+        }
+    }
+    return result;
+}
+
+// Функция для нахождения номера первого элемента, который равен X
+int findFirstEqualX(const std::vector<int>& nums, int X) {
+    int left = 0;
+    int right = nums.size() - 1;
+    int result = -1; // Значение по умолчанию, если элемент не найден
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (nums[mid] == X) {
+            result = mid; // Сохраняем результат
+            right = mid - 1; // Ищем левее
+        } else if (nums[mid] < X) {
+            left = mid + 1; // Ищем вправо
+        } else {
+            right = mid - 1; // Ищем в левой части
+        }
+    }
+    return result;
+}
+
+int main() {
+    // Пример данных для первой задачи
+    std::vector<int> numbers = {50, 75, 85, 90, 95, 100, 105}; 
+    int maxLessThan100 = findMaxLessThan100(numbers);
+    std::cout << "Наибольшее число меньше 100: " << maxLessThan100 << std::endl;
+
+    // Пример данных для второй задачи
+    std::vector<std::string> strings = {"hello", "bingo", "world", "beyond", "test", "apple"};
+    int indexWithoutB = findFirstStringWithoutB(strings);
+    std::cout << "Индекс первой строки без 'b': " << indexWithoutB << std::endl;
+
+    // Пример данных для третьей задачи
+    int X = 85; // число, которое нужно найти
+    int firstEqualX = findFirstEqualX(numbers, X);
+    std::cout << "Индекс первого элемента, равного " << X << ": " << firstEqualX << std::endl;
+
+    return 0;
+}
