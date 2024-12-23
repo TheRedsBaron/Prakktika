@@ -1,0 +1,197 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <set>
+#include <stack>
+
+using namespace std;
+
+// Обход в глубину (Depth First Search)
+void dfs(int v, vector<vector<int>>& graph, vector<bool>& visited, vector<int>& dfsOrder) {
+    visited[v] = true;
+    dfsOrder.push_back(v);
+
+    for (int u : graph[v]) {
+        if (!visited[u]) {
+            dfs(u, graph, visited, dfsOrder);
+        }
+    }
+}
+
+// Задача 1: Вывод вершин в порядке обхода в глубину
+void task1(int n, vector<vector<int>>& graph) {
+    vector<bool> visited(n + 1, false);
+    vector<int> dfsOrder;
+
+    dfs(1, graph, visited, dfsOrder);
+
+    cout << "Порядок обхода в глубину: ";
+    for (int v : dfsOrder) {
+        cout << v << " ";
+    }
+    cout << endl;
+}
+
+// Задача 2: Количество компонент связности
+int task2(int n, vector<vector<int>>& graph) {
+    vector<bool> visited(n + 1, false);
+    int componentCount = 0;
+
+    for (int i = 1; i <= n; ++i) {
+        if (!visited[i]) {
+            componentCount++;
+            dfs(i, graph, visited, vector<int>());
+        }
+    }
+
+    return componentCount;
+}
+
+// Задача 3: Количество вершин, из которых ребра ведут только в четные вершины
+int task3(int n, vector<vector<int>>& graph) {
+    int count = 0;
+
+    for (int v = 1; v <= n; ++v) {
+        bool allEven = true;
+        for (int u : graph[v]) {
+            if (u % 2 != 0) {
+                allEven = false;
+                break;
+            }
+        }
+        if (allEven) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+// Задача 4: Количество вершин с четной степенью, где все соседи - с нечетной степенью
+int task4(int n, vector<vector<int>>& graph) {
+    int count = 0;
+
+    for (int v = 1; v <= n; ++v) {
+        if (graph[v].size() % 2 == 0) {
+            bool allOdd = true;
+            for (int u : graph[v]) {
+                if (graph[u].size() % 2 == 0) {
+                    allOdd = false;
+                    break;
+                }
+            }
+            if (allOdd) {
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+// Задача 5: Минимальное количество монет для рекламы
+int task5(int n, int m, vector<pair<int, int>>& partnerships, vector<int>& costs) {
+    vector<vector<int>> graph(n + 1);
+    
+    for (const auto& p : partnerships) {
+        graph[p.first].push_back(p.second);
+        graph[p.second].push_back(p.first); // Неориентированный граф
+    }
+
+    vector<bool> visited(n + 1, false);
+    int totalCost = 0;
+
+    for (int i = 1; i <= n; ++i) {
+        if (!visited[i]) {
+            int minCost = costs[i - 1]; // Начальная стоимость в самой первой фирме
+            set<int> cluster;
+
+            stack<int> stack;
+            stack.push(i);
+
+            while (!stack.empty()) {
+                int v = stack.top();
+                stack.pop();
+
+                if (!visited[v]) {
+                    visited[v] = true;
+                    cluster.insert(v);
+
+                    for (int u : graph[v]) {
+                        if (!visited[u]) {
+                            stack.push(u);
+                        }
+                        if (costs[u - 1] < minCost) {
+                            minCost = costs[u - 1]; // Находим минимальную стоимость в компоненте
+                        }
+                    }
+                }
+            }
+            totalCost += minCost; // Добавляем стоимость для этой компоненты
+        }
+    }
+
+    return totalCost;
+}
+
+int main() {
+    int n, m;
+
+    // Ввод для всех задач
+    cout << "Введите количество вершин и ребер: ";
+    cin >> n >> m;
+
+    vector<vector<int>> graph(n + 1);
+    cout << "Введите " << m << " пар ребер (a b):" << endl;
+    for (int i = 0; i < m; ++i) {
+        int a, b;
+        cin >> a >> b;
+        graph[a].push_back(b);
+        graph[b].push_back(a); // Неориентированный граф
+    }
+
+    // Задача 1
+    task1(n, graph);
+
+    // Задача 2
+    int components = task2(n, graph);
+    cout << "Количество компонент связности: " << components << endl;
+
+    // Задача 3 (проверка на ориентированный граф)
+    cout << "Введите количество ребер для ориентированного графа: ";
+    cin >> m;
+    vector<vector<int>> directedGraph(n + 1);
+    cout << "Введите " << m << " пар ребер (a b):" << endl;
+    for (int i = 0; i < m; ++i) {
+        int a, b;
+        cin >> a >> b;
+        directedGraph[a].push_back(b); // Ориентированный граф
+    }
+    int oddVertexCount = task3(n, directedGraph);
+    cout << "Количество вершин, из которых ребра ведут только в четные вершины: " << oddVertexCount << endl;
+
+    // Задача 4
+    int evenDegreeCount = task4(n, graph);
+    cout << "Количество вершин с четной степенью и соседями с нечетной степенью: " << evenDegreeCount << endl;
+
+    // Задача 5
+    cout << "Введите стоимость рекламы для каждой фирмы: ";
+    vector<int> costs(n);
+    for (int i = 0; i < n; ++i) {
+        cin >> costs[i];
+    }
+    cout << "Введите количество пар сотрудничества: ";
+    cin >> m;
+    vector<pair<int, int>> partnerships(m);
+    cout << "Введите пары сотрудничества (a b):" << endl;
+    for (int i = 0; i < m; ++i) {
+        int a, b;
+        cin >> a >> b;
+        partnerships[i] = {a, b};
+    }
+    
+    int minCost = task5(n, m, partnerships, costs);
+    cout << "Минимальное количество монет для рекламы: " << minCost << endl;
+
+    return 0;
+}
