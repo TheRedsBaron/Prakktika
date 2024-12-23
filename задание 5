@@ -1,0 +1,109 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+// Функция для ввода неориентированного графа в матрицу смежности
+void inputGraphAdjacencyMatrix(int n, int m, vector<vector<int>>& adjMatrix) {
+    // Инициализация матрицы нулями
+    adjMatrix.assign(n + 1, vector<int>(n + 1, 0));
+    
+    cout << "Введите " << m << " ребер (a b):" << endl;
+    for (int i = 0; i < m; ++i) {
+        int a, b;
+        cin >> a >> b;
+        // Обновление матрицы для неориентированного графа
+        adjMatrix[a][b] = 1;
+        adjMatrix[b][a] = 1;
+    }
+}
+
+// Функция для ввода неориентированного графа в список смежности
+void inputGraphAdjacencyList(int n, int m, vector<vector<int>>& adjList) {
+    adjList.assign(n + 1, vector<int>());
+    
+    cout << "Введите " << m << " ребер (a b):" << endl;
+    for (int i = 0; i < m; ++i) {
+        int a, b;
+        cin >> a >> b;
+        // Обновление списка для неориентированного графа
+        adjList[a].push_back(b);
+        adjList[b].push_back(a);
+    }
+}
+
+// Функция для нахождения номера вершины с максимальной степенью
+int vertexWithMaxDegree(const vector<vector<int>>& adjMatrix, int n) {
+    int maxDegree = -1;
+    int vertex = -1;
+
+    for (int i = 1; i <= n; ++i) {
+        int degree = 0;
+        for (int j = 1; j <= n; ++j) {
+            degree += adjMatrix[i][j];
+        }
+        if (degree > maxDegree) {
+            maxDegree = degree;
+            vertex = i;
+        }
+    }
+    return vertex;
+}
+
+// Функция для проверки существования ребра между двумя вершинами максимальной степени
+bool hasEdgeBetweenMaxDegreeVertices(const vector<vector<int>>& adjMatrix, int n) {
+    int maxDegree = -1;
+    vector<int> maxVertices;
+
+    // Поиск вершин с максимальной степенью
+    for (int i = 1; i <= n; ++i) {
+        int degree = 0;
+        for (int j = 1; j <= n; ++j) {
+            degree += adjMatrix[i][j];
+        }
+        if (degree > maxDegree) {
+            maxDegree = degree;
+            maxVertices.clear();
+            maxVertices.push_back(i);
+        } else if (degree == maxDegree) {
+            maxVertices.push_back(i);
+        }
+    }
+
+    // Проверка на существование ребра между вершинами с максимальной степенью
+    for (size_t i = 0; i < maxVertices.size(); ++i) {
+        for (size_t j = i + 1; j < maxVertices.size(); ++j) {
+            if (adjMatrix[maxVertices[i]][maxVertices[j]] == 1) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+int main() {
+    int n, m;
+
+    cout << "Введите количество вершин (n) и количество ребер (m): ";
+    cin >> n >> m;
+
+    // 1. Ввод графа в матрицу смежности
+    vector<vector<int>> adjMatrix;
+    inputGraphAdjacencyMatrix(n, m, adjMatrix);
+
+    // 2. Ввод графа в список смежности
+    vector<vector<int>> adjList;
+    inputGraphAdjacencyList(n, m, adjList);
+
+    // 3. Находим номер вершины с максимальной степенью
+    int maxDegreeVertex = vertexWithMaxDegree(adjMatrix, n);
+    cout << "Вершина с максимальной степенью: " << maxDegreeVertex << endl;
+
+    // 4. Проверяем есть ли ребро между двумя вершинами с максимальной степенью
+    bool edgeExists = hasEdgeBetweenMaxDegreeVertices(adjMatrix, n);
+    cout << "Существует ли ребро между двумя вершинами с максимальной степенью? " << (edgeExists ? "Да" : "Нет") << endl;
+
+    return 0;
+}
