@@ -1,0 +1,118 @@
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <algorithm>
+
+// Класс точки
+class Point {
+private:
+    double x;
+    double y;
+
+public:
+    // Конструктор по двум значениям
+    Point(double x_val, double y_val) : x(x_val), y(y_val) {}
+
+    // Метод для вывода координат на экран
+    void displayCoordinates() const {
+        std::cout << "Координаты точки: (" << x << ", " << y << ")\n";
+    }
+
+    // Метод вычисления расстояния до точки (0, 0)
+    double distanceToOrigin() const {
+        return std::sqrt(x * x + y * y);
+    }
+};
+
+// Класс отрезка
+class Segment {
+private:
+    Point point1;
+    Point point2;
+
+public:
+    // Конструктор по двум точкам
+    Segment(const Point& p1, const Point& p2) : point1(p1), point2(p2) {}
+
+    // Метод вычисления длины отрезка
+    double length() const {
+        double deltaX = point1.distanceToOrigin();
+        double deltaY = point2.distanceToOrigin();
+        return std::sqrt((deltaX * deltaX) + (deltaY * deltaY));
+    }
+};
+
+// Класс кинотеатра
+class Cinema {
+private:
+    std::vector<std::pair<std::string, double>> movies; // Вектор пар "Название фильма / цена"
+
+public:
+    // Конструктор по умолчанию
+    Cinema() {}
+
+    // Конструктор по набору фильмов
+    Cinema(const std::vector<std::pair<std::string, double>>& movie_list) : movies(movie_list) {}
+
+    // Метод для добавления фильма
+    void addMovie(const std::string& title, double price) {
+        movies.emplace_back(title, price);
+    }
+
+    // Метод для нахождения самого дешевого фильма
+    std::pair<std::string, double> cheapestMovie() const {
+        if (movies.empty()) return {"", 0};
+        return *std::min_element(movies.begin(), movies.end(),
+            [](const auto& a, const auto& b) { return a.second < b.second; });
+    }
+};
+
+// Функция сравнения фильмов из двух кинотеатров
+void compareCinemas(const Cinema& cinema1, const Cinema& cinema2) {
+    auto cheapest1 = cinema1.cheapestMovie();
+    auto cheapest2 = cinema2.cheapestMovie();
+
+    std::cout << "Самый дешевый фильм в первом кинотеатре: " 
+              << cheapest1.first << " - Цена: " << cheapest1.second << "\n";
+    std::cout << "Самый дешевый фильм во втором кинотеатре: "
+              << cheapest2.first << " - Цена: " << cheapest2.second << "\n";
+
+    if (cheapest1.second < cheapest2.second) {
+        std::cout << "Первый кинотеатр предлагает более дешевый фильм.\n";
+    } else if (cheapest1.second > cheapest2.second) {
+        std::cout << "Второй кинотеатр предлагает более дешевый фильм.\n";
+    } else {
+        std::cout << "Оба кинотеатра предлагают фильмы по одинаковой цене.\n";
+    }
+}
+
+// Основная функция
+int main() {
+    // Создаём точки
+    Point p1(3.0, 4.0);
+    Point p2(1.0, 2.0);
+    
+    // Выводим координаты точки
+    p1.displayCoordinates();
+    p2.displayCoordinates();
+
+    // Создаем отрезок
+    Segment segment(p1, p2);
+    std::cout << "Длина отрезка: " << segment.length() << "\n";
+
+    // Создаем кинотеатры
+    Cinema cinema1;
+    cinema1.addMovie("Фильм A", 150);
+    cinema1.addMovie("Фильм B", 100);
+
+    Cinema cinema2;
+    cinema2.addMovie("Фильм C", 120);
+    cinema2.addMovie("Фильм D", 100);
+
+    // Сравниваем кинотеатры
+    compareCinemas(cinema1, cinema2);
+
+    return 0;
+}
