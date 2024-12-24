@@ -1,0 +1,75 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <limits>
+
+using namespace std;
+
+const int INF = numeric_limits<int>::max();
+
+// Функция для нахождения кратчайшего пути с помощью алгоритма Дейкстры
+vector<int> dijkstra(int n, const vector<vector<pair<int, int>>>& graph) {
+    vector<int> distance(n + 1, INF);
+    vector<int> parent(n + 1, -1);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> minHeap;
+
+    distance[1] = 0;
+    minHeap.push({0, 1}); // (расстояние, вершина)
+
+    while (!minHeap.empty()) {
+        int dist = minHeap.top().first;
+        int current = minHeap.top().second;
+        minHeap.pop();
+
+        // Если найденное расстояние больше, чем уже сохраненное, пропускаем
+        if (dist > distance[current]) continue;
+
+        // Итерация по соседним вершинам
+        for (const auto& neighbor : graph[current]) {
+            int next = neighbor.first;
+            int weight = neighbor.second;
+
+            // Проверка на обновление расстояния
+            if (distance[current] + weight < distance[next]) {
+                distance[next] = distance[current] + weight;
+                parent[next] = current; // Запоминаем родителя
+                minHeap.push({distance[next], next});
+            }
+        }
+    }
+
+    return parent;
+}
+
+// Функция для вывода пути
+void printPath(const vector<int>& parent, int vertex) {
+    if (vertex == -1) return;
+    printPath(parent, parent[vertex]);
+    cout << vertex << " ";
+}
+
+int main() {
+    int n, m; // n - количество вершин, m - количество ребер
+    cout << "Введите количество вершин и ребер: ";
+    cin >> n >> m;
+
+    vector<vector<pair<int, int>>> graph(n + 1);
+
+    cout << "Введите ребра в формате (начало, конец, вес):\n";
+    for (int i = 0; i < m; ++i) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        graph[u].emplace_back(v, w);
+    }
+
+    vector<int> parent = dijkstra(n, graph);
+
+    cout << "Кратчайший путь от 1 до " << n << ": ";
+    if (parent[n] == -1) {
+        cout << "Нет пути\n";
+    } else {
+        printPath(parent, n);
+    }
+
+    return 0;
+}
