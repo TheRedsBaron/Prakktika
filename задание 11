@@ -1,0 +1,124 @@
+#include <iostream>
+#include <vector>
+#include <list>
+#include <functional>
+#include <string>
+#include <algorithm>
+
+class HashTable {
+private:
+    std::vector<std::list<int>> table; // Хранилище элементов
+    int elementCount;                   // Количество элементов
+    int tableSize;                      // Размер таблицы
+
+    // Хеш-функция
+    int hash(int key) const {
+        return key % tableSize;
+    }
+
+public:
+    // Конструктор
+    HashTable(int size) : tableSize(size), elementCount(0) {
+        table.resize(size);
+    }
+
+    // Добавление элемента в таблицу
+    void add(int key) {
+        int index = hash(key);
+        auto& cell = table[index];
+        
+        // Проверяем наличие элемента (избегаем дублирования)
+        if (std::find(cell.begin(), cell.end(), key) == cell.end()) {
+            cell.push_back(key);
+            elementCount++;
+        }
+    }
+
+    // Удаление элемента из таблицы
+    void remove(int key) {
+        int index = hash(key);
+        auto& cell = table[index];
+
+        auto it = std::find(cell.begin(), cell.end(), key);
+        if (it != cell.end()) {
+            cell.erase(it);
+            elementCount--;
+        }
+    }
+
+    // Проверка наличия элемента
+    bool contains(int key) const {
+        int index = hash(key);
+        const auto& cell = table[index];
+        return std::find(cell.begin(), cell.end(), key) != cell.end();
+    }
+
+    // Подсчет количества элементов
+    int count() const {
+        return elementCount;
+    }
+};
+
+class Hotel {
+private:
+    HashTable guestTable; // Хеш-таблица для хранения гостей
+    int numberOfRooms;    // Количество номеров в отеле
+
+public:
+    // Конструктор
+    Hotel(int rooms) : guestTable(rooms), numberOfRooms(rooms) {}
+
+    // Добавление гостя в номер
+    bool addGuest(int guestId) {
+        if (guestTable.contains(guestId)) {
+            std::cout << "Гость с ID " << guestId << " уже зарегистрирован.\n";
+            return false; // Гость уже зарегистрирован
+        }
+
+        guestTable.add(guestId);
+        std::cout << "Гость с ID " << guestId << " успешно добавлен в отель.\n";
+        return true; // Успешно добавлен
+    }
+
+    // Удаление гостя из отеля
+    bool removeGuest(int guestId) {
+        if (!guestTable.contains(guestId)) {
+            std::cout << "Гость с ID " << guestId << " не найден.\n";
+            return false; // Гость не найден
+        }
+
+        guestTable.remove(guestId);
+        std::cout << "Гость с ID " << guestId << " успешно удален из отеля.\n";
+        return true; // Успешно удален
+    }
+
+    // Проверка наличия гостя
+    bool isGuestPresent(int guestId) {
+        return guestTable.contains(guestId);
+    }
+
+    // Получение количества зарегистрированных гостей
+    int getRegisteredGuestsCount() {
+        return guestTable.count();
+    }
+};
+
+int main() {
+    Hotel myHotel(10); // Создаем отель с 10 номерами
+
+    myHotel.addGuest(1);
+    myHotel.addGuest(2);
+    myHotel.addGuest(3);
+    myHotel.addGuest(1); // Пытаемся добавить повторно
+
+    std::cout << "Количество зарегистрированных гостей: " 
+              << myHotel.getRegisteredGuestsCount() << "\n";
+
+    myHotel.removeGuest(2);
+    myHotel.removeGuest(4); // Пытаемся удалить несуществующего гостя
+
+    std::cout << "Количество зарегистрированных гостей: " 
+              << myHotel.getRegisteredGuestsCount() << "\n";
+
+    return 0;
+}
