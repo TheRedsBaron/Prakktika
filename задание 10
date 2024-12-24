@@ -1,0 +1,142 @@
+#include <iostream>
+
+class TreeNode {
+public:
+    int roomNumber;     // Номер комнаты
+    int count;          // Количество людей в комнате
+    TreeNode* left;     // Левый потомок
+    TreeNode* right;    // Правый потомок
+
+    TreeNode(int roomNum) : roomNumber(roomNum), count(0), left(nullptr), right(nullptr) {}
+};
+
+class BinarySearchTree {
+private:
+    TreeNode* root;     // Корень дерева
+
+    void insert(TreeNode*& node, int roomNumber, bool allowMultiple) {
+        if (!node) {
+            node = new TreeNode(roomNumber);
+            if (!allowMultiple) { // Если в комнате может быть только один человек
+                node->count = 1; // Первый человек размещен
+            }
+            return;
+        }
+        if (roomNumber < node->roomNumber) {
+            insert(node->left, roomNumber, allowMultiple);
+        } else if (roomNumber > node->roomNumber) {
+            insert(node->right, roomNumber, allowMultiple);
+        } else {
+            if (allowMultiple) { // Если в комнате может быть множество людей
+                node->count++; // Увеличиваем количество людей в комнате
+            }
+            // Если в комнате может быть только один человек, ничего не делаем, комната уже занята
+        }
+    }
+
+    void remove(TreeNode*& node, int roomNumber, bool allowMultiple) {
+        if (!node) return;
+        if (roomNumber < node->roomNumber) {
+            remove(node->left, roomNumber, allowMultiple);
+        } else if (roomNumber > node->roomNumber) {
+            remove(node->right, roomNumber, allowMultiple);
+        } else {
+            // Найден узел для удаления
+            if (allowMultiple) {
+                if (node->count > 0) { // Уменьшаем количество людей в комнате
+                    node->count--;
+                }
+                if (node->count == 0) { // Если количество достигает 0, удаляем узел
+                    if (node->left && node->right) {
+                        TreeNode* minNode = findMin(node->right);
+                        node->roomNumber = minNode->roomNumber;
+                        node->count = minNode->count;
+                        remove(node->right, minNode->roomNumber, allowMultiple);
+                    } else {
+                        TreeNode* temp = node;
+                        node = (node->left) ? node->left : node->right;
+                        delete temp;
+                    }
+                }
+            } else {
+                // Вариант, когда комната может быть только занята или свободна
+                delete node; // Освобождаем узел
+                node = nullptr; // Устанавливаем узел в nullptr
+            }
+        }
+    }
+
+    TreeNode* findMin(TreeNode* node) {
+        while (node && node->left) {
+            node = node->left;
+        }
+        return node;
+    }
+
+    bool find(TreeNode* node, int roomNumber) {
+        if (!node) return false;
+        if (roomNumber < node->roomNumber) {
+            return find(node->left, roomNumber);
+        } else if (roomNumber > node->roomNumber) {
+            return find(node->right, roomNumber);
+        } else {
+            return true;
+        }
+    }
+
+    void printRooms(TreeNode* node) {
+        if (node) {
+            printRooms(node->left);
+            std::cout << "Room " << node->roomNumber << ": " << node->count << " people" << std::endl;
+            printRooms(node->right);
+        }
+    }
+
+public:
+    BinarySearchTree() : root(nullptr) {}
+
+    void insertRoom(int roomNumber, bool allowMultiple = false) {
+        insert(root, roomNumber, allowMultiple);
+    }
+
+    void removeRoom(int roomNumber, bool allowMultiple = false) {
+        remove(root, roomNumber, allowMultiple);
+    }
+
+    bool findRoom(int roomNumber) {
+        return find(root, roomNumber);
+    }
+
+    void printAllRooms() {
+        printRooms(root);
+    }
+};
+
+int main() {
+    BinarySearchTree bstSingle, bstMultiple;
+
+    // Пример работы с однокомнатными
+    std::cout << "=== Hotel with Single Occupancy ===" << std::endl;
+    bstSingle.insertRoom(101);
+    bstSingle.insertRoom(102);
+    std::cout << "Rooms after adding 101 and 102:" << std::endl;
+    bstSingle.printAllRooms();
+
+    bstSingle.removeRoom(101);
+    std::cout << "Rooms after removing 101:" << std::endl;
+    bstSingle.printAllRooms();
+
+    // Пример работы с многокомнатными
+    std::cout << "\n=== Hotel with Multiple Occupancy ===" << std::endl;
+    bstMultiple.insertRoom(201, true);
+    bstMultiple.insertRoom(202, true);
+    bstMultiple.insertRoom(201, true); // Увеличиваем количество в комнате 201
+    std::cout << "Rooms after adding 201 (2 people) and 202 (1 person):" << std::endl;
+    bstMultiple.printAllRooms();
+
+    bstMultiple.removeRoom(201, true); // Уменьшаем кол-во людей в комнате 201
+    std::cout << "Rooms after removing 1 person from room 201:" << std::endl;
+    bstMultiple.printAllRooms();
+
+    return 0;
+}
