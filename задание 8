@@ -1,0 +1,252 @@
+#include <iostream>
+#include <stdexcept>
+
+using namespace std;
+
+// Стек на основе массива
+class ArrayStack {
+private:
+    int* arr;
+    int capacity;
+    int top;
+
+public:
+    ArrayStack(int size) {
+        capacity = size;
+        arr = new int[capacity];
+        top = -1;
+    }
+
+    ~ArrayStack() {
+        delete[] arr;
+    }
+
+    void push(int x) {
+        if (top == capacity - 1) {
+            throw overflow_error("Стек переполнен");
+        }
+        arr[++top] = x;
+    }
+
+    void pop() {
+        if (top == -1) {
+            throw underflow_error("Стек пуст");
+        }
+        --top;
+    }
+
+    int peek() {
+        if (top == -1) {
+            throw underflow_error("Стек пуст");
+        }
+        return arr[top];
+    }
+
+    int size() {
+        return top + 1;
+    }
+};
+
+// Очередь на основе массива
+class ArrayQueue {
+private:
+    int* arr;
+    int capacity;
+    int front, rear;
+
+public:
+    ArrayQueue(int size) {
+        capacity = size;
+        arr = new int[capacity];
+        front = 0;
+        rear = -1;
+    }
+
+    ~ArrayQueue() {
+        delete[] arr;
+    }
+
+    void push(int x) {
+        if (size() == capacity) {
+            throw overflow_error("Очередь переполнена");
+        }
+        rear = (rear + 1) % capacity;
+        arr[rear] = x;
+    }
+
+    void pop() {
+        if (size() == 0) {
+            throw underflow_error("Очередь пуста");
+        }
+        front = (front + 1) % capacity;
+    }
+
+    int peek() {
+        if (size() == 0) {
+            throw underflow_error("Очередь пуста");
+        }
+        return arr[front];
+    }
+
+    int size() {
+        return (rear - front + capacity) % capacity + 1;
+    }
+};
+
+// Узел для связного списка
+struct Node {
+    int data;
+    Node* next;
+
+    Node(int d) : data(d), next(nullptr) {}
+};
+
+// Стек на основе связанного списка
+class LinkedListStack {
+private:
+    Node* top;
+
+public:
+    LinkedListStack() : top(nullptr) {}
+
+    ~LinkedListStack() {
+        while (top) {
+            pop();
+        }
+    }
+
+    void push(int x) {
+        Node* newNode = new Node(x);
+        newNode->next = top;
+        top = newNode;
+    }
+
+    void pop() {
+        if (!top) {
+            throw underflow_error("Стек пуст");
+        }
+        Node* temp = top;
+        top = top->next;
+        delete temp;
+    }
+
+    int peek() {
+        if (!top) {
+            throw underflow_error("Стек пуст");
+        }
+        return top->data;
+    }
+
+    int size() {
+        int count = 0;
+        Node* current = top;
+        while (current) {
+            count++;
+            current = current->next;
+        }
+        return count;
+    }
+};
+
+// Очередь на основе связанного списка
+class LinkedListQueue {
+private:
+    Node *front, *rear;
+
+public:
+    LinkedListQueue() : front(nullptr), rear(nullptr) {}
+
+    ~LinkedListQueue() {
+        while (front) {
+            pop();
+        }
+    }
+
+    void push(int x) {
+        Node* newNode = new Node(x);
+        if (!rear) {
+            front = rear = newNode;
+            return;
+        }
+        rear->next = newNode;
+        rear = newNode;
+    }
+
+    void pop() {
+        if (!front) {
+            throw underflow_error("Очередь пуста");
+        }
+        Node* temp = front;
+        front = front->next;
+        if (!front) {
+            rear = nullptr;
+        }
+        delete temp;
+    }
+
+    int peek() {
+        if (!front) {
+            throw underflow_error("Очередь пуста");
+        }
+        return front->data;
+    }
+
+    int size() {
+        int count = 0;
+        Node* current = front;
+        while (current) {
+            count++;
+            current = current->next;
+        }
+        return count;
+    }
+};
+
+// Тестирование всех структур данных
+int main() {
+    // Тест стека на основе массива
+    cout << "Тест стека на основе массива:" << endl;
+    ArrayStack arrayStack(5);
+    arrayStack.push(1);
+    arrayStack.push(2);
+    cout << "Верхний элемент: " << arrayStack.peek() << endl; // 2
+    cout << "Размер стека: " << arrayStack.size() << endl; // 2
+    arrayStack.pop();
+    cout << "Верхний элемент после pop: " << arrayStack.peek() << endl; // 1
+    cout << "Размер стека после pop: " << arrayStack.size() << endl; // 1
+    
+    // Тест очереди на основе массива
+    cout << "Тест очереди на основе массива:" << endl;
+    ArrayQueue arrayQueue(5);
+    arrayQueue.push(1);
+    arrayQueue.push(2);
+    cout << "Передний элемент: " << arrayQueue.peek() << endl; // 1
+    cout << "Размер очереди: " << arrayQueue.size() << endl; // 2
+    arrayQueue.pop();
+    cout << "Передний элемент после pop: " << arrayQueue.peek() << endl; // 2
+    cout << "Размер очереди после pop: " << arrayQueue.size() << endl; // 1
+    
+    // Тест стека на основе связанного списка
+    cout << "Тест стека на основе связанного списка:" << endl;
+    LinkedListStack linkedStack;
+    linkedStack.push(3);
+    linkedStack.push(4);
+    cout << "Верхний элемент: " << linkedStack.peek() << endl; // 4
+    cout << "Размер стека: " << linkedStack.size() << endl; // 2
+    linkedStack.pop();
+    cout << "Верхний элемент после pop: " << linkedStack.peek() << endl; // 3
+    cout << "Размер стека после pop: " << linkedStack.size() << endl; // 1
+    
+    // Тест очереди на основе связанного списка
+    cout << "Тест очереди на основе связанного списка:" << endl;
+    LinkedListQueue linkedQueue;
+    linkedQueue.push(5);
+    linkedQueue.push(6);
+    cout << "Передний элемент: " << linkedQueue.peek() << endl; // 5
+    cout << "Размер очереди: " << linkedQueue.size() << endl; // 2
+    linkedQueue.pop();
+    cout << "Передний элемент после pop: " << linkedQueue.peek() << endl; // 6
+    cout << "Размер очереди после pop: " << linkedQueue.size() << endl; // 1
+
+    return 0;
+}
