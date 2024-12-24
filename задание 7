@@ -1,0 +1,169 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+
+using namespace std;
+
+// Класс для представления графа
+class Graph {
+public:
+    int vertices;
+    vector<vector<int>> adj;
+
+    Graph(int v) {
+        vertices = v;
+        adj.resize(v + 1);
+    }
+
+    void addEdge(int u, int v) {
+        adj[u].push_back(v);
+        adj[v].push_back(u); // Неориентированный граф
+    }
+
+    void bfs() {
+        vector<bool> visited(vertices + 1, false);
+        queue<int> q;
+        q.push(1);
+        visited[1] = true;
+
+        cout << "Обход в ширину: ";
+        while (!q.empty()) {
+            int node = q.front();
+            q.pop();
+            cout << node << " ";
+
+            for (int neighbor : adj[node]) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    q.push(neighbor);
+                }
+            }
+        }
+        cout << endl;
+    }
+
+    void evenDistance() {
+        vector<int> distance(vertices + 1, INT_MAX);
+        queue<int> q;
+        
+        q.push(1);
+        distance[1] = 0;
+
+        while (!q.empty()) {
+            int node = q.front();
+            q.pop();
+
+            for (int neighbor : adj[node]) {
+                if (distance[neighbor] == INT_MAX) {
+                    distance[neighbor] = distance[node] + 1;
+                    q.push(neighbor);
+                }
+            }
+        }
+
+        cout << "Вершины на четном расстоянии: ";
+        for (int i = 1; i <= vertices; ++i) {
+            if (distance[i] % 2 == 0 && distance[i] != INT_MAX) {
+                cout << i << " ";
+            }
+        }
+        cout << endl;
+    }
+
+    void maxDistancePair() {
+        vector<int> distance(vertices + 1, INT_MAX);
+        int furthestNode = 1;
+
+        for (int i = 1; i <= vertices; ++i) {
+            fill(distance.begin(), distance.end(), INT_MAX);
+            queue<int> q;
+            q.push(i);
+            distance[i] = 0;
+
+            while (!q.empty()) {
+                int node = q.front();
+                q.pop();
+
+                for (int neighbor : adj[node]) {
+                    if (distance[neighbor] == INT_MAX) {
+                        distance[neighbor] = distance[node] + 1;
+                        q.push(neighbor);
+                    }
+                }
+            }
+
+            int maxDist = 0;
+            for (int j = 1; j <= vertices; ++j) {
+                if (distance[j] != INT_MAX && distance[j] > maxDist) {
+                    maxDist = distance[j];
+                    furthestNode = j;
+                }
+            }
+        }
+
+        cout << "Пара вершин с максимальным расстоянием: " << 1 << " и " << furthestNode << endl;
+    }
+
+    void cityWithMinMaxDistance() {
+        vector<int> maxDist(vertices + 1, 0);
+
+        for (int i = 1; i <= vertices; ++i) {
+            vector<int> distance(vertices + 1, INT_MAX);
+            queue<int> q;
+            q.push(i);
+            distance[i] = 0;
+
+            while (!q.empty()) {
+                int node = q.front();
+                q.pop();
+
+                for (int neighbor : adj[node]) {
+                    if (distance[neighbor] == INT_MAX) {
+                        distance[neighbor] = distance[node] + 1;
+                        q.push(neighbor);
+                    }
+                }
+            }
+
+            for (int j = 1; j <= vertices; ++j) {
+                if (distance[j] != INT_MAX) {
+                    maxDist[i] = max(maxDist[i], distance[j]);
+                }
+            }
+        }
+
+        int minMaxDist = INT_MAX;
+        int city = -1;
+        for (int i = 1; i <= vertices; ++i) {
+            if (maxDist[i] < minMaxDist) {
+                minMaxDist = maxDist[i];
+                city = i;
+            }
+        }
+
+        cout << "Город с минимальным максимальным расстоянием: " << city << endl;
+    }
+};
+
+int main() {
+    int n, m;
+    cout << "Введите количество вершин и ребер: ";
+    cin >> n >> m;
+
+    Graph g(n);
+
+    cout << "Введите пары чисел, представляющие ребра (a b): " << endl;
+    for (int i = 0; i < m; ++i) {
+        int a, b;
+        cin >> a >> b;
+        g.addEdge(a, b);
+    }
+
+    g.bfs();
+    g.evenDistance();
+    g.maxDistancePair();
+    g.cityWithMinMaxDistance();
+
+    return 0;
+}
